@@ -1,5 +1,3 @@
-import Footer from "@/components/sections/footer";
-import Header from "@/components/sections/header";
 import Hero from "@/components/sections/hero";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,22 +9,22 @@ import {
   Moon,
   ShoppingCart,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function LandingPage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
+    <>
       <main className="flex-1">
         <Hero />
 
         {/* Features Section */}
         <section
           id="features"
-          className="py-20 bg-white max-w-screen-xl mx-auto"
+          className="py-20 bg-white max-w-screen-xl mx-auto px-3"
         >
           <div className="">
             <div className="text-center max-w-[800px] mx-auto mb-16">
-              <Badge className="bg-[#A1DEB0]/80 text-foreground hover:bg-[#A1DEB0] px-3 py-1">
+              <Badge className="bg-[#A1DEB0]/80 text-foreground hover:bg-[#A1DEB0] px-3 py-1 mb-4">
                 Características y Beneficios
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -134,10 +132,10 @@ export default function LandingPage() {
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="py-20 bg-[#A1DEB0]/20">
+        <section id="how-it-works" className="py-20 bg-[#A1DEB0]/20 px-3">
           <div className="mx-auto max-w-screen-xl">
             <div className="text-center max-w-[800px] mx-auto mb-16">
-              <Badge className="bg-[#A1DEB0]/80 text-foreground hover:bg-[#A1DEB0] px-3 py-1">
+              <Badge className="bg-[#A1DEB0]/80 text-foreground hover:bg-[#A1DEB0] px-3 py-1 mb-4">
                 Simple y Efectivo
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -191,10 +189,10 @@ export default function LandingPage() {
         </section>
 
         {/* FAQ Section */}
-        <section id="faq" className="py-20 from-[#A1DEB0]/50">
+        <section id="faq" className="py-20 from-[#A1DEB0]/50 px-3">
           <div className="mx-auto max-w-screen-xl">
             <div className="text-center max-w-[800px] mx-auto mb-16">
-              <Badge className="bg-[#A1DEB0]/80 text-foreground hover:bg-[#A1DEB0] px-3 py-1">
+              <Badge className="bg-[#A1DEB0]/80 text-foreground hover:bg-[#A1DEB0] px-3 py-1 mb-4">
                 FAQ
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -220,7 +218,7 @@ export default function LandingPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-[#A1DEB0]/80 to-[#A1DEB0] text-foreground">
+        <section className="py-20 bg-gradient-to-r from-[#A1DEB0]/80 to-[#A1DEB0] text-foreground px-3">
           <div className="mx-auto max-w-screen-xl">
             <div className="max-w-[800px] mx-auto text-center">
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -231,9 +229,11 @@ export default function LandingPage() {
                 respiración y calidad de vida.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="">
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Comprar Ahora
+                <Button size="lg" variant="secondary" className="" asChild>
+                  <Link href="#hero">
+                    <ShoppingCart className="mr-2 h-5 w-5" />
+                    Comprar Ahora
+                  </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="" asChild>
                   <a
@@ -249,8 +249,7 @@ export default function LandingPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </div>
+    </>
   );
 }
 

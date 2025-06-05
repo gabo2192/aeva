@@ -1,17 +1,14 @@
-"use client";
-import { CheckCircle, ChevronRight } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import Checkout from "./checkout";
 
 export default function Hero() {
-  const [open, setOpen] = useState(false);
   return (
     <>
-      <section className=" relative py-20 md:py-28 bg-gradient-to-b from-[#A1DEB0]/10 to-white ">
+      <section id="hero" className="relative py-20 md:py-28 bg-gradient-to-b from-[#A1DEB0]/10 to-white px-3">
         <div className="container flex flex-col md:flex-row items-center gap-8 md:gap-16 max-w-screen-xl mx-auto">
           <div className="flex-1 space-y-6 text-center md:text-left">
             <Badge className="bg-[#A1DEB0]/80 text-foreground hover:bg-[#A1DEB0] px-3 py-1">
@@ -28,10 +25,7 @@ export default function Hero() {
               mejor y rendir más.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-              <Button size="lg" onClick={() => setOpen(true)}>
-                Comprar Ahora
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Checkout />
               <Button size="lg" variant="outline" asChild>
                 <Link href="#how-it-works">Saber Más</Link>
               </Button>
@@ -68,13 +62,13 @@ export default function Hero() {
           </div> */}
           </div>
           <div className="flex-1 relative">
-            <div className="relative h-[400px] w-[400px] mx-auto">
+            <div className="relative size-full md:size-[400px] mx-auto">
               <Image
                 src="/aeva.png?height=400&width=400"
                 alt="Tira Nasal AEVA"
                 width={400}
                 height={400}
-                className="object-contain"
+                className="object-contain w-full h-full"
                 priority
               />
             </div>
@@ -89,7 +83,6 @@ export default function Hero() {
           </div>
         </div>
       </section>
-      <Checkout open={open} setOpen={setOpen} />
     </>
   );
 }
