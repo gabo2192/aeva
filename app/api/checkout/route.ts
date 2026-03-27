@@ -5,6 +5,7 @@ import { makeFunctionReference } from "convex/server";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
+const getProduct = makeFunctionReference<"query">("products:getProduct");
 const getStock = makeFunctionReference<"query">("products:getStock");
 const reserveStock = makeFunctionReference<"mutation">("products:reserveStock");
 const createOrder = makeFunctionReference<"mutation">("orders:createOrder");
@@ -12,7 +13,9 @@ const createOrder = makeFunctionReference<"mutation">("orders:createOrder");
 export async function POST(request: NextRequest) {
   const { quantity } = await request.json();
 
-  const unitPrice = 69;
+  // Get product info from Convex
+  const product = await convex.query(getProduct, { slug: "tira-nasal-aeva" });
+  const unitPrice = product?.unitPrice ?? 69;
   const totalAmount = quantity * unitPrice;
 
   // Check stock availability
@@ -35,7 +38,7 @@ export async function POST(request: NextRequest) {
       items: [
         {
           id: "1",
-          title: "Tira Nasal AEVA x 30 días",
+          title: product?.name ?? "Tira Nasal AEVA x 30 días",
           quantity,
           unit_price: unitPrice,
         },

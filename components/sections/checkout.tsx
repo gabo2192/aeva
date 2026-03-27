@@ -24,35 +24,55 @@ import {
   SheetTrigger,
 } from "../ui/sheet";
 
+interface ProductData {
+  stock: number;
+  unitPrice: number;
+  originalPrice: number;
+  name: string;
+}
+
+const DEFAULT_PRODUCT: ProductData = {
+  stock: 0,
+  unitPrice: 69,
+  originalPrice: 185,
+  name: "Tira Nasal AEVA",
+};
+
 export default function Checkout() {
   const { quantity, setQuantity } = useShoppingCart();
   const [loading, setLoading] = useState(false);
-  const [stock, setStock] = useState<number | null>(null);
+  const [product, setProduct] = useState<ProductData>(DEFAULT_PRODUCT);
+  const [fetched, setFetched] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const unitPrice = 69;
-  const originalPrice = 185;
+  const { stock, unitPrice, originalPrice, name } = product;
   const discount = Math.round(
     ((originalPrice - unitPrice) / originalPrice) * 100
   );
 
-  const fetchStock = useCallback(async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       const res = await fetch("/api/stock");
       const data = await res.json();
-      setStock(data.stock);
+      setProduct({
+        stock: data.stock ?? 0,
+        unitPrice: data.unitPrice ?? 69,
+        originalPrice: data.originalPrice ?? 185,
+        name: data.name ?? "Tira Nasal AEVA",
+      });
+      setFetched(true);
     } catch {
-      // Stock check is non-blocking
+      setFetched(true);
     }
   }, []);
 
   useEffect(() => {
-    fetchStock();
-  }, [fetchStock]);
+    fetchProduct();
+  }, [fetchProduct]);
 
-  const outOfStock = stock !== null && stock <= 0;
-  const lowStock = stock !== null && stock > 0 && stock <= 10;
-  const maxQuantity = stock !== null ? Math.min(5, stock) : 5;
+  const outOfStock = fetched && stock <= 0;
+  const lowStock = fetched && stock > 0 && stock <= 10;
+  const maxQuantity = fetched ? Math.min(5, stock) : 5;
 
   const handleCheckout = async () => {
     setError(null);
@@ -68,7 +88,7 @@ export default function Checkout() {
       if (!response.ok) {
         setError(data.error || "Error al procesar tu compra");
         if (data.availableStock !== undefined) {
-          setStock(data.availableStock);
+          setProduct((prev) => ({ ...prev, stock: data.availableStock }));
           if (quantity > data.availableStock) {
             setQuantity(Math.max(1, data.availableStock));
           }
@@ -89,7 +109,7 @@ export default function Checkout() {
   return (
     <Sheet
       onOpenChange={(open) => {
-        if (open) fetchStock();
+        if (open) fetchProduct();
       }}
     >
       <SheetTrigger asChild>
@@ -117,9 +137,7 @@ export default function Checkout() {
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm leading-tight">
-                  Tira Nasal AEVA
-                </h3>
+                <h3 className="font-semibold text-sm leading-tight">{name}</h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   Pack 30 días
                 </p>
@@ -130,15 +148,17 @@ export default function Checkout() {
                   <span className="text-sm text-muted-foreground line-through">
                     S/.{originalPrice}
                   </span>
-                  <span className="text-xs font-semibold text-white bg-emerald-500 px-2 py-0.5 rounded-full">
-                    -{discount}%
-                  </span>
+                  {discount > 0 && (
+                    <span className="text-xs font-semibold text-white bg-emerald-500 px-2 py-0.5 rounded-full">
+                      -{discount}%
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Stock indicator */}
-            {stock !== null && (
+            {fetched && (
               <div className="mt-3">
                 {outOfStock ? (
                   <div className="flex items-center gap-2 text-xs text-red-600 font-medium">
@@ -224,12 +244,14 @@ export default function Checkout() {
               <span className="text-muted-foreground">Envío</span>
               <span className="text-emerald-600 font-medium">Gratis</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Ahorras</span>
-              <span className="text-emerald-600 font-medium">
-                -S/.{quantity * (originalPrice - unitPrice)}.00
-              </span>
-            </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Ahorras</span>
+                <span className="text-emerald-600 font-medium">
+                  -S/.{quantity * (originalPrice - unitPrice)}.00
+                </span>
+              </div>
+            )}
             <div className="h-px bg-border" />
             <div className="flex justify-between font-semibold text-lg">
               <span>Total</span>
