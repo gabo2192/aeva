@@ -1,5 +1,6 @@
 import Footer from "@/components/sections/footer";
 import Header from "@/components/sections/header";
+import { ConvexClientProvider } from "@/lib/convex";
 import { ShoppingCartProvider } from "@/context/shopping-cart-context";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -31,13 +32,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ShoppingCartProvider>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            {children}
-            <Footer />
-          </div>
-        </ShoppingCartProvider>
+        <ConvexClientProvider>
+          <ShoppingCartProvider>
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              {children}
+              <Footer />
+            </div>
+          </ShoppingCartProvider>
+        </ConvexClientProvider>
       </body>
     </html>
   );
