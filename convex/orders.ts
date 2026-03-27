@@ -52,8 +52,8 @@ export const updateOrderStatus = mutation({
       // Create an order if webhook arrives before redirect
       const orderId = await ctx.db.insert("orders", {
         quantity: 1,
-        unitPrice: 99,
-        totalAmount: 99,
+        unitPrice: 69,
+        totalAmount: 69,
         status: args.status,
         mpPaymentId: args.mpPaymentId,
         mpStatus: args.mpStatus,

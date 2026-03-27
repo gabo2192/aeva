@@ -10,7 +10,7 @@ const createOrder = makeFunctionReference<"mutation">("orders:createOrder");
 export async function POST(request: NextRequest) {
   const { quantity } = await request.json();
 
-  const unitPrice = 99;
+  const unitPrice = 69;
   const totalAmount = quantity * unitPrice;
 
   const response = await preference.create({

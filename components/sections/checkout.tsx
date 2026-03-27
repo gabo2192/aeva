@@ -26,7 +26,7 @@ export default function Checkout() {
   const { quantity, setQuantity } = useShoppingCart();
   const [loading, setLoading] = useState(false);
 
-  const unitPrice = 99;
+  const unitPrice = 69;
   const originalPrice = 185;
   const discount = Math.round(((originalPrice - unitPrice) / originalPrice) * 100);
 

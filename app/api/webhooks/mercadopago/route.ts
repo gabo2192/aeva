@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         quantity: paymentData.metadata?.quantity
           ? Number(paymentData.metadata.quantity)
           : 1,
-        totalAmount: paymentData.transaction_amount || 99,
+        totalAmount: paymentData.transaction_amount || 69,
         status,
         customerName:
           [paymentData.payer?.first_name, paymentData.payer?.last_name]
