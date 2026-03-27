@@ -9,6 +9,7 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 const updateOrderStatus = makeFunctionReference<"mutation">("orders:updateOrderStatus");
 const markTelegramNotified = makeFunctionReference<"mutation">("orders:markTelegramNotified");
+const releaseStock = makeFunctionReference<"mutation">("products:releaseStock");
 
 function mapMpStatus(
   status: string
@@ -51,6 +52,9 @@ export async function POST(request: NextRequest) {
 
     const status = mapMpStatus(paymentData.status || "pending");
     const preferenceId = paymentData.metadata?.preference_id as string | undefined;
+    const quantity = paymentData.metadata?.quantity
+      ? Number(paymentData.metadata.quantity)
+      : 1;
 
     // Update order in Convex
     const orderId = await convex.mutation(updateOrderStatus, {
@@ -65,15 +69,21 @@ export async function POST(request: NextRequest) {
           .join(" ") || undefined,
     });
 
+    // Release stock back if payment was rejected or cancelled
+    if (status === "rejected" || status === "cancelled") {
+      await convex.mutation(releaseStock, {
+        slug: "tira-nasal-aeva",
+        quantity,
+      });
+    }
+
     // Send Telegram notification
     const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
     const telegramChatId = process.env.TELEGRAM_CHAT_ID;
 
     if (telegramBotToken && telegramChatId) {
       const message = formatOrderNotification({
-        quantity: paymentData.metadata?.quantity
-          ? Number(paymentData.metadata.quantity)
-          : 1,
+        quantity,
         totalAmount: paymentData.transaction_amount || 69,
         status,
         customerName:

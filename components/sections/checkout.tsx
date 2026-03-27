@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useShoppingCart } from "@/context/shopping-cart-context";
 import {
+  AlertCircle,
   Check,
   Minus,
   Plus,
@@ -10,9 +11,10 @@ import {
   ShoppingCart,
   Truck,
   Loader2,
+  Package,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -25,12 +27,35 @@ import {
 export default function Checkout() {
   const { quantity, setQuantity } = useShoppingCart();
   const [loading, setLoading] = useState(false);
+  const [stock, setStock] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const unitPrice = 69;
   const originalPrice = 185;
-  const discount = Math.round(((originalPrice - unitPrice) / originalPrice) * 100);
+  const discount = Math.round(
+    ((originalPrice - unitPrice) / originalPrice) * 100
+  );
+
+  const fetchStock = useCallback(async () => {
+    try {
+      const res = await fetch("/api/stock");
+      const data = await res.json();
+      setStock(data.stock);
+    } catch {
+      // Stock check is non-blocking
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStock();
+  }, [fetchStock]);
+
+  const outOfStock = stock !== null && stock <= 0;
+  const lowStock = stock !== null && stock > 0 && stock <= 10;
+  const maxQuantity = stock !== null ? Math.min(5, stock) : 5;
 
   const handleCheckout = async () => {
+    setError(null);
     setLoading(true);
     try {
       const response = await fetch("/api/checkout", {
@@ -40,16 +65,33 @@ export default function Checkout() {
       });
       const data = await response.json();
 
+      if (!response.ok) {
+        setError(data.error || "Error al procesar tu compra");
+        if (data.availableStock !== undefined) {
+          setStock(data.availableStock);
+          if (quantity > data.availableStock) {
+            setQuantity(Math.max(1, data.availableStock));
+          }
+        }
+        setLoading(false);
+        return;
+      }
+
       if (data.init_point) {
         window.location.href = data.init_point;
       }
     } catch {
+      setError("Error de conexión. Intenta de nuevo.");
       setLoading(false);
     }
   };
 
   return (
-    <Sheet>
+    <Sheet
+      onOpenChange={(open) => {
+        if (open) fetchStock();
+      }}
+    >
       <SheetTrigger asChild>
         <Button className="gradient-primary text-white border-0 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:opacity-95 transition-all">
           <ShoppingCart className="h-4 w-4 mr-2" />
@@ -95,6 +137,28 @@ export default function Checkout() {
               </div>
             </div>
 
+            {/* Stock indicator */}
+            {stock !== null && (
+              <div className="mt-3">
+                {outOfStock ? (
+                  <div className="flex items-center gap-2 text-xs text-red-600 font-medium">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    Agotado
+                  </div>
+                ) : lowStock ? (
+                  <div className="flex items-center gap-2 text-xs text-amber-600 font-medium">
+                    <Package className="h-3.5 w-3.5" />
+                    Quedan pocas unidades ({stock})
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
+                    <Check className="h-3.5 w-3.5" />
+                    En stock
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Quantity selector */}
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-emerald-500/10">
               <span className="text-sm text-muted-foreground">Cantidad</span>
@@ -102,7 +166,7 @@ export default function Checkout() {
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="h-8 w-8 rounded-full border border-border flex items-center justify-center hover:bg-emerald-50 transition-colors disabled:opacity-40"
-                  disabled={quantity <= 1}
+                  disabled={quantity <= 1 || outOfStock}
                 >
                   <Minus className="h-3 w-3" />
                 </button>
@@ -110,9 +174,11 @@ export default function Checkout() {
                   {quantity}
                 </span>
                 <button
-                  onClick={() => setQuantity(Math.min(5, quantity + 1))}
+                  onClick={() =>
+                    setQuantity(Math.min(maxQuantity, quantity + 1))
+                  }
                   className="h-8 w-8 rounded-full border border-border flex items-center justify-center hover:bg-emerald-50 transition-colors disabled:opacity-40"
-                  disabled={quantity >= 5}
+                  disabled={quantity >= maxQuantity || outOfStock}
                 >
                   <Plus className="h-3 w-3" />
                 </button>
@@ -138,6 +204,14 @@ export default function Checkout() {
         </div>
 
         <SheetFooter className="border-t border-border pt-4 mt-auto">
+          {/* Error message */}
+          {error && (
+            <div className="w-full flex items-center gap-2 text-sm text-red-600 bg-red-50 rounded-lg p-3 mb-2">
+              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              {error}
+            </div>
+          )}
+
           {/* Price breakdown */}
           <div className="w-full space-y-2 mb-4">
             <div className="flex justify-between text-sm">
@@ -165,14 +239,16 @@ export default function Checkout() {
 
           <Button
             onClick={handleCheckout}
-            disabled={loading}
-            className="w-full h-12 gradient-primary text-white border-0 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:opacity-95 transition-all text-base font-semibold"
+            disabled={loading || outOfStock}
+            className="w-full h-12 gradient-primary text-white border-0 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:opacity-95 transition-all text-base font-semibold disabled:opacity-50"
           >
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Procesando...
               </>
+            ) : outOfStock ? (
+              <>Agotado</>
             ) : (
               <>Pagar con Mercado Pago</>
             )}

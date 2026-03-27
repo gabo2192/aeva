@@ -5,6 +5,8 @@ import { makeFunctionReference } from "convex/server";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
+const getStock = makeFunctionReference<"query">("products:getStock");
+const reserveStock = makeFunctionReference<"mutation">("products:reserveStock");
 const createOrder = makeFunctionReference<"mutation">("orders:createOrder");
 
 export async function POST(request: NextRequest) {
@@ -12,6 +14,21 @@ export async function POST(request: NextRequest) {
 
   const unitPrice = 69;
   const totalAmount = quantity * unitPrice;
+
+  // Check stock availability
+  const stock = await convex.query(getStock, { slug: "tira-nasal-aeva" });
+  if (stock < quantity) {
+    return NextResponse.json(
+      { error: "Sin stock suficiente", availableStock: stock },
+      { status: 400 }
+    );
+  }
+
+  // Reserve stock
+  await convex.mutation(reserveStock, {
+    slug: "tira-nasal-aeva",
+    quantity,
+  });
 
   const response = await preference.create({
     body: {
