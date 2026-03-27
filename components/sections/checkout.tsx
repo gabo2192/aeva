@@ -148,12 +148,12 @@ export default function Checkout() {
                 ) : lowStock ? (
                   <div className="flex items-center gap-2 text-xs text-amber-600 font-medium">
                     <Package className="h-3.5 w-3.5" />
-                    Quedan pocas unidades ({stock})
+                    Quedan pocas unidades ({stock} disponibles)
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
                     <Check className="h-3.5 w-3.5" />
-                    En stock
+                    En stock ({stock} disponibles)
                   </div>
                 )}
               </div>
