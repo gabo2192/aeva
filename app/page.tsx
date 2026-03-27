@@ -173,8 +173,7 @@ export default function LandingPage() {
                 </Button>
                 <Button
                   size="lg"
-                  variant="outline"
-                  className="border-white/30 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
+                  className="bg-white text-emerald-700 hover:bg-white/90 shadow-xl font-semibold"
                   asChild
                 >
                   <a
