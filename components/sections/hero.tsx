@@ -1,88 +1,94 @@
-import { CheckCircle } from "lucide-react";
+import { Sparkles, Shield, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import Checkout from "./checkout";
 
 export default function Hero() {
   return (
-    <>
-      <section id="hero" className="relative py-20 md:py-28 bg-gradient-to-b from-[#A1DEB0]/10 to-white px-3">
-        <div className="container flex flex-col md:flex-row items-center gap-8 md:gap-16 max-w-screen-xl mx-auto">
-          <div className="flex-1 space-y-6 text-center md:text-left">
-            <Badge className="bg-[#A1DEB0]/80 text-foreground hover:bg-[#A1DEB0] px-3 py-1">
+    <section
+      id="hero"
+      className="relative overflow-hidden py-20 md:py-32 px-4 md:px-6"
+    >
+      {/* Background decoration */}
+      <div className="absolute inset-0 gradient-primary-soft" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-emerald-400/5 blur-3xl -translate-y-1/2 translate-x-1/3" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-teal-400/5 blur-3xl translate-y-1/2 -translate-x-1/3" />
+
+      <div className="relative max-w-screen-xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-20">
+        <div className="flex-1 space-y-8 text-center md:text-left">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+            <Sparkles className="h-4 w-4 text-emerald-600" />
+            <span className="text-sm font-medium text-emerald-700">
               Respira Mejor. Vive Mejor.
-            </Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Mejora Tu Respiración Natural con las Tiras Nasales AEVA
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-[600px] mx-auto md:mx-0">
-              Experimenta alivio inmediato y mejora tu flujo de aire con
-              nuestras innovadoras tiras nasales sin medicamentos. AEVA está
-              diseñada para abrir las fosas nasales de forma cómoda y efectiva,
-              tanto de día como de noche, ayudándote a respirar mejor, dormir
-              mejor y rendir más.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-              <Checkout />
-              <Button size="lg" variant="outline" asChild>
-                <Link href="#how-it-works">Saber Más</Link>
-              </Button>
-            </div>
-            {/* <div className="flex items-center justify-center md:justify-start gap-4 pt-4">
-            <div className="flex -space-x-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="h-8 w-8 rounded-full border-2 border-background bg-muted overflow-hidden"
-                >
-                  <Image
-                    src={`/placeholder.svg?height=32&width=32`}
-                    alt="Usuario"
-                    width={32}
-                    height={32}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star
-                    key={i}
-                    className="h-4 w-4 fill-yellow-400 text-yellow-400"
-                  />
-                ))}
-              </div>
-              <span className="ml-2 text-sm font-medium">
-                4.9/5 de más de 2,000 reseñas
-              </span>
-            </div>
-          </div> */}
+            </span>
           </div>
-          <div className="flex-1 relative">
-            <div className="relative size-full md:size-[400px] mx-auto">
-              <Image
-                src="/aeva.png?height=400&width=400"
-                alt="Tira Nasal AEVA"
-                width={400}
-                height={400}
-                className="object-contain w-full h-full"
-                priority
-              />
+
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
+            Respiración natural,{" "}
+            <span className="gradient-text">potenciada</span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-muted-foreground max-w-[540px] mx-auto md:mx-0 leading-relaxed">
+            Tiras nasales innovadoras que abren tus vías respiratorias al
+            instante. Sin medicamentos. Cómodas todo el día y toda la noche.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+            <Checkout />
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-emerald-500/30 text-foreground hover:bg-emerald-50 hover:border-emerald-500/50"
+              asChild
+            >
+              <Link href="#how-it-works">Descubre cómo funciona</Link>
+            </Button>
+          </div>
+
+          {/* Trust indicators */}
+          <div className="flex items-center gap-6 justify-center md:justify-start pt-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Shield className="h-4 w-4 text-emerald-500" />
+              <span>Sin medicamentos</span>
             </div>
-            <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 bg-white rounded-lg shadow-lg p-4 hidden md:block">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <span className="text-sm font-medium">
-                  Solución Sin Medicamentos
-                </span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Zap className="h-4 w-4 text-emerald-500" />
+              <span>Efecto inmediato</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 relative">
+          <div className="relative w-full max-w-[420px] mx-auto">
+            {/* Glow behind product */}
+            <div className="absolute inset-0 gradient-primary opacity-20 blur-3xl rounded-full scale-75" />
+            <Image
+              src="/aeva.png"
+              alt="Tira Nasal AEVA"
+              width={420}
+              height={420}
+              className="relative object-contain w-full h-full drop-shadow-2xl"
+              priority
+            />
+          </div>
+
+          {/* Floating badge */}
+          <div className="absolute -bottom-2 left-4 md:left-0 bg-white rounded-2xl shadow-xl shadow-emerald-500/10 p-4 border border-emerald-500/10">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full gradient-primary flex items-center justify-center">
+                <Zap className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">+30% flujo de aire</p>
+                <p className="text-xs text-muted-foreground">
+                  Resultados inmediatos
+                </p>
               </div>
             </div>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }
