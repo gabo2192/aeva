@@ -1,11 +1,14 @@
-import { api } from "@/convex/_generated/api";
 import { client } from "@/lib/mercado-pago";
 import { formatOrderNotification, sendTelegramNotification } from "@/lib/telegram";
 import { Payment } from "mercadopago";
 import { NextRequest, NextResponse } from "next/server";
 import { ConvexHttpClient } from "convex/browser";
+import { makeFunctionReference } from "convex/server";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+const updateOrderStatus = makeFunctionReference<"mutation">("orders:updateOrderStatus");
+const markTelegramNotified = makeFunctionReference<"mutation">("orders:markTelegramNotified");
 
 function mapMpStatus(
   status: string
@@ -50,7 +53,7 @@ export async function POST(request: NextRequest) {
     const preferenceId = paymentData.metadata?.preference_id as string | undefined;
 
     // Update order in Convex
-    const orderId = await convex.mutation(api.orders.updateOrderStatus, {
+    const orderId = await convex.mutation(updateOrderStatus, {
       mpPaymentId: String(paymentId),
       mpPreferenceId: preferenceId,
       status,
@@ -85,7 +88,7 @@ export async function POST(request: NextRequest) {
 
       // Mark as notified
       if (orderId) {
-        await convex.mutation(api.orders.markTelegramNotified, { orderId });
+        await convex.mutation(markTelegramNotified, { orderId });
       }
     }
 

@@ -1,9 +1,11 @@
 import { preference } from "@/lib/mercado-pago";
 import { NextRequest, NextResponse } from "next/server";
 import { ConvexHttpClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
+import { makeFunctionReference } from "convex/server";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+const createOrder = makeFunctionReference<"mutation">("orders:createOrder");
 
 export async function POST(request: NextRequest) {
   const { quantity } = await request.json();
@@ -32,7 +34,7 @@ export async function POST(request: NextRequest) {
   });
 
   // Create order in Convex
-  await convex.mutation(api.orders.createOrder, {
+  await convex.mutation(createOrder, {
     quantity,
     unitPrice,
     totalAmount,
